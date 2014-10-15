@@ -14,6 +14,8 @@ use yii\filters\VerbFilter;
  */
 class PostController extends Controller
 {
+    public $layout = 'column2';
+
     public function behaviors()
     {
         return [
