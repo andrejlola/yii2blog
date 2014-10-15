@@ -1,6 +1,7 @@
 <?php
 use app\widgets\TagCloud;
 use app\widgets\UserMenu;
+use app\widgets\RecentComments;
 /* @var $content string */
 ?>
 <?php $this->beginContent('@app/views/layouts/main.php'); ?>
@@ -14,6 +15,11 @@ use app\widgets\UserMenu;
                 <?php
                 echo TagCloud::widget([
                     'maxTags' => \Yii::$app->params['tagCloudCount'],
+                ]);
+                ?>
+                <?php
+                echo RecentComments::widget([
+                    'maxComments' => \Yii::$app->params['recentCommentsCount'],
                 ]);
                 ?>
             </div>

@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use \yii\helpers\Html;
 
 /**
  * This is the model class for table "{{%comment}}".
@@ -77,6 +78,46 @@ class Comment extends \yii\db\ActiveRecord
         return self::find()
             ->where(['status' => self::STATUS_PENDING])
             ->count()
+        ;
+    }
+
+    /**
+     * @param Post $post the post that this comment belongs to. If null, the method
+     * will query for the post.
+     * @return string the permalink URL for this comment
+     */
+    public function getUrl($post = null)
+    {
+        if($post === null) {
+            $post = $this->post;
+        }
+        return $post->url.'#c'.$this->id;
+    }
+
+    /**
+     * @return string the hyperlink display for the current comment's author
+     */
+    public function getAuthorLink()
+    {
+        if(!empty($this->url)) {
+            return Html::a(Html::encode($this->author), $this->url);
+        } else {
+            return Html::a($this->author);
+        }
+    }
+
+    /**
+     * @param integer $limit the maximum number of comments that should be returned
+     * @return array the most recently added comments
+     */
+    public static function findRecentComments($limit = 10)
+    {
+        return self::find()
+            ->where('status='.self::STATUS_APPROVED)
+            ->orderBy('create_time DESC')
+            ->limit($limit)
+            ->with('post')
+            ->all()
         ;
     }
 }
