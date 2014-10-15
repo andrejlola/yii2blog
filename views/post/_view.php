@@ -11,7 +11,7 @@ use yii\helpers\Html;
         posted by <?php echo $model->author->username . ' on ' . date('F j, Y',$model->create_time); ?>
     </div>
     <div class="content">
-        <?=\yii\helpers\Markdown::process($model->content)?>
+        <?php echo \yii\helpers\Markdown::process($model->content); ?>
     </div>
     <div class="nav">
         <b>Tags:</b>

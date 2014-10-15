@@ -21,8 +21,8 @@ use \yii\helpers\Html;
  */
 class Comment extends \yii\db\ActiveRecord
 {
-    const STATUS_PENDING=1;
-    const STATUS_APPROVED=2;
+    const STATUS_PENDING = 1;
+    const STATUS_APPROVED = 2;
 
     /**
      * @inheritdoc
@@ -60,6 +60,22 @@ class Comment extends \yii\db\ActiveRecord
             'url' => Yii::t('app', 'Url'),
             'post_id' => Yii::t('app', 'Post ID'),
         ];
+    }
+
+    /**
+     * This is invoked before the record is saved.
+     * @return boolean whether the record should be saved.
+     */
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if ($insert) {
+                $this->create_time = time();
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -119,5 +135,14 @@ class Comment extends \yii\db\ActiveRecord
             ->with('post')
             ->all()
         ;
+    }
+
+    /**
+     * Approves a comment.
+     */
+    public function approve()
+    {
+        $this->status = Comment::STATUS_APPROVED;
+        $this->update(['status']);
     }
 }

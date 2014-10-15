@@ -21,9 +21,11 @@ use yii\helpers\Html;
  */
 class Post extends \yii\db\ActiveRecord
 {
-    const STATUS_DRAFT=1;
-    const STATUS_PUBLISHED=2;
-    const STATUS_ARCHIVED=3;
+    const STATUS_DRAFT = 1;
+    const STATUS_PUBLISHED = 2;
+    const STATUS_ARCHIVED = 3;
+
+    private $_oldTags;
 
     /**
      * @inheritdoc
@@ -64,11 +66,64 @@ class Post extends \yii\db\ActiveRecord
     }
 
     /**
+     * This is invoked when a record is populated with data from a find() call.
+     */
+    public function afterFind()
+    {
+        parent::afterFind();
+        $this->_oldTags = $this->tags;
+    }
+
+    /**
+     * This is invoked before the record is saved.
+     * @return boolean whether the record should be saved.
+     */
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if ($insert) {
+                $this->create_time=$this->update_time=time();
+                $this->author_id=Yii::$app->user->identity->id;
+            } else {
+                $this->update_time=time();
+            }
+            return true;
+        } else {
+           return false;
+        }
+    }
+
+//    /**
+//     * This is invoked after the record is saved.
+//     */
+//    public function afterSave($insert)
+//    {
+//        parent::afterSave(true, $insert);
+//        Tag::updateFrequency($this->_oldTags, $this->tags);
+//    }
+
+    /**
+     * This is invoked after the record is deleted.
+     */
+    public function afterDelete()
+    {
+        if (parent::beforeDelete()) {
+            Comment::deleteAll('post_id='.$this->id);
+            Tag::updateFrequency($this->tags, '');
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getComments()
     {
-        return $this->hasMany(Comment::className(), ['post_id' => 'id']);
+        return $this
+            ->hasMany(Comment::className(), ['post_id' => 'id'])
+            ->andOnCondition(['status' => Comment::STATUS_APPROVED]);
     }
 
     /**
@@ -76,10 +131,7 @@ class Post extends \yii\db\ActiveRecord
      */
     public function getCommentsCount()
     {
-        return $this
-            ->hasMany(Comment::className(), ['post_id' => 'id'])
-            ->andOnCondition(['status' => Comment::STATUS_APPROVED])
-            ->count();
+        return $this->getComments()->count();
     }
 
     /**
@@ -114,5 +166,22 @@ class Post extends \yii\db\ActiveRecord
                 'title' => $this->title,
             ]
         );
+    }
+
+    /**
+     * Adds a new comment to this post.
+     * This method will set status and post_id of the comment accordingly.
+     * @param Comment $comment the comment to be added
+     * @return boolean whether the comment is saved successfully
+     */
+    public function addComment($comment)
+    {
+        if(Yii::$app->params['commentNeedApproval']) {
+            $comment->status = Comment::STATUS_PENDING;
+        } else {
+            $comment->status = Comment::STATUS_APPROVED;
+        }
+        $comment->post_id = $this->id;
+        return $comment->save();
     }
 }

@@ -3,11 +3,14 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\Post;
+use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+
+use app\models\Post;
+use app\models\Comment;
 
 /**
  * PostController implements the CRUD actions for Post model.
@@ -50,9 +53,15 @@ class PostController extends Controller
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        $post = $this->findModel($id);
+        $comment = $this->newComment($post);
+        return $this->render(
+            'view',
+            [
+                'model' => $post,
+                'comment' => $comment,
+            ]
+        );
     }
 
     /**
@@ -119,5 +128,22 @@ class PostController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     * @param Post $post
+     * @return Comment
+     */
+    protected function newComment($post)
+    {
+        $comment = new Comment();
+        if($comment->load(Yii::$app->request->post()) && $post->addComment($comment))
+        {
+            if($comment->status == Comment::STATUS_PENDING) {
+                \Yii::$app->session->setFlash('commentSubmitted', 'Thank you for your comment. Your comment will be posted once it is approved.');
+            }
+            \Yii::$app->response->refresh();
+        }
+        return $comment;
     }
 }

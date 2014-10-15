@@ -82,4 +82,42 @@ class Tag extends \yii\db\ActiveRecord
         }
         return $tags;
     }
+
+    public static function addTags($tags)
+    {
+        if (count($tags) >0) {
+            $inTags = preg_replace('/(\S+)/i', '\'\1\'', $tags);
+            $sql = "UPDATE ".Tag::tableName()." SET frequency=frequency+1 WHERE name IN (". join(",", $inTags) .' ) ';
+            Yii::$app->db->createCommand($sql)->execute();
+            foreach($tags as $name) {
+                $model = static::find()->where('name=:name',[':name' => $name])->one();
+                if ($model === null) {
+                    $tag = new Tag();
+                    $tag->name = $name;
+                    $tag->frequency = 1;
+                    $tag->save();
+                }
+            }
+        }
+    }
+
+    public static function removeTags($tags)
+    {
+        if(empty($tags)) {
+            return;
+        }
+        $inTags = preg_replace('/(\S+)/i', '\'\1\'', $tags);
+        $sql = "UPDATE {{%tag}} SET frequency=frequency-1 WHERE name IN (". join(",", $inTags) .' ) ';
+        Yii::$app->db->createCommand($sql)->execute();
+        $sql = "DELETE FROM {{%tag}} WHERE frequency<=0";
+        Yii::$app->db->createCommand($sql)->execute();
+    }
+
+    public static function updateFrequency($oldTags, $newTags)
+    {
+        $oldTags=self::string2array($oldTags);
+        $newTags=self::string2array($newTags);
+        self::addTags(array_values(array_diff($newTags, $oldTags)));
+        self::removeTags(array_values(array_diff($oldTags, $newTags)));
+    }
 }
