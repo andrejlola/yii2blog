@@ -96,8 +96,9 @@ class Post extends \yii\db\ActiveRecord
     public function getTagLinks()
     {
         $links = [];
-        foreach(Tag::string2array($this->tags) as $tag)
-            $links[] = Html::a(Html::encode($tag), array('post/index', 'tag'=>$tag));
+        foreach(Tag::string2array($this->tags) as $tag) {
+            $links[] = Html::a(Html::encode($tag), ['post/index', 'tag' => $tag]);
+        }
         return $links;
     }
 

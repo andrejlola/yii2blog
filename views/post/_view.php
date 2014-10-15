@@ -11,17 +11,12 @@ use yii\helpers\Html;
         posted by <?php echo $model->author->username . ' on ' . date('F j, Y',$model->create_time); ?>
     </div>
     <div class="content">
-        <?php
-        //$this->beginWidget('CMarkdown', array('purifyOutput'=>true));
-        echo $model->content;
-        //$this->endWidget();
-        ?>
+        <?=\yii\helpers\Markdown::process($model->content)?>
     </div>
     <div class="nav">
         <b>Tags:</b>
         <?php
-        //echo implode(', ', $model->tagLinks);
-        echo $model->tagLinks;
+        echo implode(', ', $model->tagLinks);
         ?>
         <br/>
         <?php echo Html::a('Permalink', $model->url); ?> |
