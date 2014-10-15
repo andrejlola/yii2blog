@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use \yii\data\Pagination;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -112,6 +113,34 @@ class PostController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * Manages all models.
+     */
+    public function actionAdmin()
+    {
+        $query = Post::find()
+            ->where('status='.Post::STATUS_PUBLISHED)
+            ->orderBy('create_time DESC');
+
+        $countQuery = clone $query;
+        $pagination = new Pagination([
+            'defaultPageSize' => 5,
+            'totalCount' => $countQuery->count()
+        ]);
+
+        $models = $query->offset($pagination->offset)
+            ->limit($pagination->limit)
+            ->all();
+
+        echo $this->render(
+            'admin',
+            [
+                'models' => $models,
+                'pagination' => $pagination,
+            ]
+        );
     }
 
     /**
