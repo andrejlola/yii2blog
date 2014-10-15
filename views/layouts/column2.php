@@ -1,5 +1,6 @@
 <?php
 use app\widgets\TagCloud;
+use app\widgets\UserMenu;
 /* @var $content string */
 ?>
 <?php $this->beginContent('@app/views/layouts/main.php'); ?>
@@ -9,6 +10,7 @@ use app\widgets\TagCloud;
                 <?php echo $content; ?>
             </div>
             <div class="col-md-3">
+                <?php if(!Yii::$app->user->isGuest) echo UserMenu::widget(); ?>
                 <?php
                 echo TagCloud::widget([
                     'maxTags' => \Yii::$app->params['tagCloudCount'],
