@@ -3,7 +3,7 @@
 namespace app\controllers;
 
 use Yii;
-use yii\base\Model;
+use yii\filters\AccessControl;
 use yii\data\ActiveDataProvider;
 use \yii\data\Pagination;
 use yii\web\Controller;
@@ -23,6 +23,26 @@ class PostController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => [
+                            'index',
+                            'view',
+                        ],
+                        'roles' => ['?'],
+                    ],
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                    [
+                        'allow' => false,
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
