@@ -41,11 +41,24 @@ class Post extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'content', 'status', 'author_id'], 'required'],
+            [['title', 'content', 'status'], 'required'],
             [['content', 'tags'], 'string'],
             [['status', 'create_time', 'update_time', 'author_id'], 'integer'],
-            [['title'], 'string', 'max' => 128]
+            [['status'], 'in', 'range' => [1, 2, 3]],
+            [['title'], 'string', 'max' => 128],
+            [['tags'], 'match', 'pattern' => '/^[\w\s,]+$/', 'message' => 'Tags can only contain word characters.'],
+            [['tags'], 'normalizeTags'],
         ];
+    }
+
+    /**
+     * Normalizes the user-entered tags.
+     * @param $attribute
+     * @param $params
+     */
+    public function normalizeTags($attribute, $params)
+    {
+        $this->tags = Tag::array2string(array_unique(Tag::string2array($this->tags)));
     }
 
     /**
@@ -82,10 +95,10 @@ class Post extends \yii\db\ActiveRecord
     {
         if (parent::beforeSave($insert)) {
             if ($insert) {
-                $this->create_time=$this->update_time=time();
-                $this->author_id=Yii::$app->user->identity->id;
+                $this->create_time = $this->update_time=time();
+                $this->author_id = Yii::$app->user->identity->id;
             } else {
-                $this->update_time=time();
+                $this->update_time = time();
             }
             return true;
         } else {
