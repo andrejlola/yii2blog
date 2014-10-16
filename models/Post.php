@@ -95,7 +95,7 @@ class Post extends \yii\db\ActiveRecord
     {
         if (parent::beforeSave($insert)) {
             if ($insert) {
-                $this->create_time = $this->update_time=time();
+                $this->create_time = $this->update_time = time();
                 $this->author_id = Yii::$app->user->identity->id;
             } else {
                 $this->update_time = time();
@@ -106,14 +106,14 @@ class Post extends \yii\db\ActiveRecord
         }
     }
 
-//    /**
-//     * This is invoked after the record is saved.
-//     */
-//    public function afterSave($insert)
-//    {
-//        parent::afterSave(true, $insert);
-//        Tag::updateFrequency($this->_oldTags, $this->tags);
-//    }
+    /**
+     * This is invoked after the record is saved.
+     */
+    public function afterSave($insert)
+    {
+        parent::afterSave(true, $insert);
+        Tag::updateFrequency($this->_oldTags, $this->tags);
+    }
 
     /**
      * This is invoked after the record is deleted.
