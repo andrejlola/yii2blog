@@ -7,6 +7,14 @@ class Lookup extends ActiveRecord
     private static $_items=[];
 
     /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return '{{%lookup}}';
+    }
+
+    /**
      * Returns the items for the specified type.
      * @param string $type item type (e.g. 'PostStatus').
      * @return array item names indexed by item code. The items are order by their position values.
