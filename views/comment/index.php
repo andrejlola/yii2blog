@@ -1,9 +1,7 @@
 <?php
 use \yii\widgets\LinkPager;
 
-$this->params['breadcrumbs']=array(
-    'Comments',
-);
+$this->params['breadcrumbs'] = ['Comments'];
 ?>
 
 <h1>Comments</h1>
@@ -15,5 +13,5 @@ foreach($models as $model) {
         ['data'=>$model]
     );
 }
-echo LinkPager::widget(array('pagination'=>$pagination));
+echo LinkPager::widget(['pagination'=>$pagination]);
 ?>

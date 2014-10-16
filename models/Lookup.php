@@ -4,7 +4,7 @@ use \yii\db\ActiveRecord;
 
 class Lookup extends ActiveRecord
 {
-    private static $_items=array();
+    private static $_items=[];
 
     /**
      * Returns the items for the specified type.
@@ -40,7 +40,7 @@ class Lookup extends ActiveRecord
      */
     private static function loadItems($type)
     {
-        self::$_items[$type] = array();
+        self::$_items[$type] = [];
         $models = static::find()->where('type=:type', ['type'=>$type])->orderBy('position')->all();
         foreach($models as $model) {
             self::$_items[$type][$model->code] = $model->name;
