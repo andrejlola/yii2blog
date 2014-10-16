@@ -59,12 +59,15 @@ class PostController extends Controller
     public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => Post::find(),
+            'query' => Post::find()->where('status='.Post::STATUS_PUBLISHED)->orderBy('create_time DESC'),
         ]);
 
-        return $this->render('index', [
-            'dataProvider' => $dataProvider,
-        ]);
+        return $this->render(
+            'index',
+            [
+                'dataProvider' => $dataProvider,
+            ]
+        );
     }
 
     /**
@@ -97,9 +100,12 @@ class PostController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+            return $this->render(
+                'create',
+                [
+                    'model' => $model,
+                ]
+            );
         }
     }
 
@@ -134,8 +140,7 @@ class PostController extends Controller
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+        return $this->refresh();
     }
 
     /**
@@ -144,8 +149,11 @@ class PostController extends Controller
     public function actionAdmin()
     {
         $query = Post::find()
-            ->where('status='.Post::STATUS_PUBLISHED)
             ->orderBy('create_time DESC');
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
 
         $countQuery = clone $query;
         $pagination = new Pagination([
@@ -162,6 +170,7 @@ class PostController extends Controller
             [
                 'models' => $models,
                 'pagination' => $pagination,
+                'dataProvider' => $dataProvider,
             ]
         );
     }

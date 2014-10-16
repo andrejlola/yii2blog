@@ -50,6 +50,14 @@ $config = [
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),
+        'formatter' => [
+            'dateFormat' => 'dd.MM.yyyy',
+            'timeFormat' => 'H:i:s',
+            'datetimeFormat' => 'dd.MM.yyyy hh:mm',
+            'decimalSeparator' => ',',
+            'thousandSeparator' => ' ',
+            'currencyCode' => 'UHR',
+        ]
     ],
     'params' => $params,
 ];

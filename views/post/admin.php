@@ -1,6 +1,7 @@
 <?php
 use \yii\helpers\Html;
 use \yii\widgets\LinkPager;
+use \yii\grid\GridView;
 
 use \app\models\Lookup;
 
@@ -38,10 +39,10 @@ $this->registerJs($deleteJS);
                 <td><?php echo date('Y/m/d', $model->create_time);?></td>
                 <td>
                     <?php
-                    echo Html::a(NULL, ['update', 'id' => $model->id], ['class' => 'icon icon-edit']);
+                    echo Html::a(NULL, ['update', 'id' => $model->id], ['class' => 'glyphicon glyphicon-edit']);
                     ?> |
                     <?php
-                    echo Html::a(NULL, ['delete', 'id' => $model->id], ['class'=>'delete icon icon-trash']);
+                    echo Html::a(NULL, ['delete', 'id' => $model->id], ['class'=>'delete glyphicon glyphicon-remove']);
                     ?>
                 <td>
             </tr>
@@ -58,5 +59,29 @@ $this->registerJs($deleteJS);
     ?>
 </table>
 <?php
-echo LinkPager::widget(['pagination'=>$pagination]);
+echo LinkPager::widget(['pagination' => $pagination]);
 ?>
+<br>
+<br>
+<br>
+<?php echo GridView::widget([
+    'dataProvider' => $dataProvider,
+    //'filterModel' => $searchModel,
+    'columns' => [
+        ['class' => 'yii\grid\SerialColumn'],
+        [
+            'label' => 'Title',
+            'attribute' => 'title'
+        ],
+        [
+            'label' => 'Status',
+            'attribute' => 'status'
+        ],
+        [
+            'label' => 'Create time',
+            'format' => 'datetime',
+            'attribute' => 'create_time'
+        ],
+        ['class' => 'yii\grid\ActionColumn'],
+    ],
+]); ?>
