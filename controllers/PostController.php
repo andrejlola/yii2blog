@@ -58,8 +58,15 @@ class PostController extends Controller
      */
     public function actionIndex()
     {
+        $whereCondition = [
+            'status' => Post::STATUS_PUBLISHED
+        ];
+        $query = Post::find()->where($whereCondition)->orderBy('create_time DESC');
+        if (isset($_GET['tag'])) {
+            $query->andWhere(['like', 'tags', $_GET['tag']]);
+        }
         $dataProvider = new ActiveDataProvider([
-            'query' => Post::find()->where('status='.Post::STATUS_PUBLISHED)->orderBy('create_time DESC'),
+            'query' => $query,
         ]);
 
         return $this->render(
